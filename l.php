@@ -235,7 +235,7 @@
 	}
 	//Email tag
 	$link = str_replace('[Email]', $email, $link);	
-	$link = str_replace('[Name]', $name, $link);	
+	$link = str_replace('[Name]', (string)$name, $link);
 	
 	//webversion and unsubscribe tags
 	if($ares_emails_id=='') //if link does not belong to an autoresponder campaign
@@ -259,6 +259,7 @@
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 		$data = curl_exec($ch);
 		$response_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);

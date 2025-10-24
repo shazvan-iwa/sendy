@@ -231,7 +231,7 @@
 			        <?php endif;?>
 			        
 			        <?php 
-				        if (file_exists('uploads/attachments/'.$cid))
+						if (count(glob("uploads/attachments/$cid/*")) > 0)
 						{
 							if($handle = opendir('uploads/attachments/'.$cid))
 							{
@@ -245,7 +245,7 @@
 												<?php 
 													$filen = $file;
 													if(strlen($filen)>30) $filen = substr($file, 0, 30).'...';
-													echo $filen;
+													echo '<a href="'.APP_PATH.'/uploads/attachments/'.$cid.'/'.$file.'" title="">'.$filen.'</a>';
 												?> 
 												(<?php echo round((filesize('uploads/attachments/'.$cid.'/'.$file)/1000000), 2);?>MB) 
 												<a href="<?php echo get_app_info('path');?>/includes/create/delete-attachment.php" data-filename="<?php echo $file;?>" title="<?php echo _('Delete');?>" id="delete<?php echo $i;?>" <?php echo get_app_info('dark_mode') ? 'style="color:black;"' : '';?>><i class="icon icon-trash"></i></a>

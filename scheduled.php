@@ -387,7 +387,7 @@
 				    	
 						//Get data
 				    	$subscriber_id = $row['id'];
-				    	$name = trim($row['name']);
+				    	$name = ucfirst(trim($row['name']));
 						$email = trim($row['email']);
 						$subscriber_list = $row['list'];
 						$custom_values = $row['custom_fields'];
@@ -446,7 +446,7 @@
 								if($name=='')
 									$title_treated = str_replace($tag, $fallback, $title_treated);
 								else
-									$title_treated = str_replace($tag, $row[strtolower($field)], $title_treated);
+									$title_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $title_treated);
 							}
 							else //if not 'Name', it's a custom field
 							{
@@ -520,7 +520,7 @@
 								if($name=='')
 									$html_treated = str_replace($tag, $fallback, $html_treated);
 								else
-									$html_treated = str_replace($tag, $row[strtolower($field)], $html_treated);
+									$html_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $html_treated);
 							}
 							else //if not 'Name', it's a custom field
 							{
@@ -593,7 +593,7 @@
 								if($name=='')
 									$plain_treated = str_replace($tag, $fallback, $plain_treated);
 								else
-									$plain_treated = str_replace($tag, $row[strtolower($field)], $plain_treated);
+									$plain_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $plain_treated);
 							}
 							else //if not 'Name', it's a custom field
 							{
@@ -738,7 +738,9 @@
 						$mail->IsHTML(true);
 						$mail->AddAddress($email, $name);
 						$mail->AddReplyTo($reply_to, $from_name);
+						$mail->AddCustomHeader('List-Unsubscribe-Post: List-Unsubscribe=One-Click');
 						$mail->AddCustomHeader('List-Unsubscribe: <'.$app_path.'/unsubscribe/'.encrypt_val($email).'/'.encrypt_val($subscriber_list).'/'.encrypt_val($campaign_id).'>');
+						$mail->AddCustomHeader('Precedence: Bulk');
 						//check if attachments are available for this campaign to attach
 						if(file_exists($server_path.'uploads/attachments/'.$campaign_id))
 						{
@@ -968,8 +970,17 @@
 			if($current_recipient_count > 0 && $current_recipient_count < $to_send_num && $offset == '')
 			{
 				//check time out
-				$tc_array = explode(':', $timeout_check);
-				$tc_prev = $tc_array[0];
+				$tc_array = is_string($timeout_check) ? explode(':', $timeout_check) : [];
+					
+				// Initialize default values for $tc_prev
+				$tc_prev = '0'; // Set a sensible default value for $tc_prev
+				if (isset($tc_array[0])) {
+					$tc_prev = $tc_array[0];
+				} else {
+				    // Log details if $tc_array[0] is missing
+				    error_log("Warning: \$tc_array[0] is not set. \$timeout_check value: " . var_export($timeout_check, true));
+				    error_log("Debug: \$tc_array = " . var_export($tc_array, true));
+			    }
 				$tc_now = $current_recipient_count;
 				$tc = $tc_now.':'.$tc_prev;
 				

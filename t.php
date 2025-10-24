@@ -128,7 +128,8 @@
 	//If user opens the newsletter, it means user did not bounce, so we set bounced to 0
 	$q = 'SELECT email FROM subscribers WHERE id = '.$userID.' AND bounced = 1';
 	$r = mysqli_query($mysqli, $q);
-	if ($r && mysqli_num_rows($r) > 0)
+	//if ($r && mysqli_num_rows($r) > 0)
+	if ($r !== false && mysqli_num_rows($r) > 0)
 	{
 	    while($row = mysqli_fetch_array($r))
 	    {

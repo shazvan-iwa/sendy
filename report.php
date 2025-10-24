@@ -369,6 +369,67 @@
     		<?php if(get_excluded_lists() != 'No data'):?>
     		<p><strong><?php echo _('Excluded');?></strong> <?php echo get_excluded_lists();?></p>
     		<?php endif;?>
+			
+			<?php 
+				if (count(glob("uploads/attachments/$cid/*")) > 0)
+				{
+					echo '<p><strong>'._('Attachments').'</strong>';
+					if($handle = opendir('uploads/attachments/'.$cid))
+					{
+						$i = -1;
+						while (false !== ($file = readdir($handle))) 
+						{
+							if($file!='.' && $file!='..'):
+				?>
+								<ul id="attachments" style="margin-top: 10px;">
+									<li id="attachment<?php echo $i;?>" style="<?php echo get_app_info('dark_mode') ? 'color:black;' : '';?> padding: 0px 0px;">
+										<?php 
+											$filen = $file;
+											if(strlen($filen)>30) $filen = substr($file, 0, 30).'...';
+											echo '<a href="'.APP_PATH.'/uploads/attachments/'.$cid.'/'.$file.'" title="">'.$filen.'</a>';
+										?> 
+										(<?php echo round((filesize('uploads/attachments/'.$cid.'/'.$file)/1000000), 2);?>MB) 
+										<a href="<?php echo get_app_info('path');?>/includes/create/delete-attachment.php" data-filename="<?php echo $file;?>" title="<?php echo _('Delete');?>" id="delete<?php echo $i;?>" <?php echo get_app_info('dark_mode') ? 'style="color:black;"' : '';?>><i class="icon icon-trash"></i></a>
+										<script type="text/javascript">
+											$("#delete<?php echo $i?>").click(function(e){
+												e.preventDefault();
+												filename = $(this).data("filename");
+												campaign_id = "<?php echo $cid?>";
+												url = $(this).attr("href");
+												c = confirm('<?php echo _('Confirm delete');?> \"'+filename+'\"?');
+												
+												if(c)
+												{
+													$.post(url, { filename: filename, campaign_id: campaign_id },
+													  function(data) {
+														  if(data)
+														  {
+															  $("#attachment<?php echo $i?>").fadeOut();
+														  }
+														  else
+														  {
+															  alert("<?php echo _('Sorry, unable to delete. Please try again later!');?>");
+														  }
+													  }
+													);
+												}
+											});
+										</script>
+									</li>
+								</ul>
+				<?php
+							endif;
+							
+							$i++;
+						}
+					
+						closedir($handle);
+						
+						echo '</p>';
+					}
+				}
+			?>
+			
 		</blockquote>
     	
     	<div class="row-fluid">

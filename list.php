@@ -342,6 +342,26 @@
 		</script>
 		
 		<?php pagination($limit); ?>	
+		
+		<?php 
+			//Show hidden lists button
+			$q = 'SELECT hide FROM lists WHERE app = '.get_app_info('app').' AND hide = 1';
+			$r = mysqli_query($mysqli, $q);
+			if ($r && mysqli_num_rows($r) > 0)
+			{
+				$no_of_hidden_lists = mysqli_num_rows($r);
+			}
+			
+			//If there are hidden lists
+			if($no_of_hidden_lists > 0)
+			{
+				//Hidden lists are being shown, ask if user wants to hide them.
+				if(!$hide_lists)
+					echo '<p style="font-size: 12px; opacity: .8; margin-top: 20px;"><a href="'.get_app_info('path').'/includes/list/show-hide-lists.php?hide=1&app='.get_app_info('app').'"><span class="icon icon-eye-close"></span> '._('Hide hidden lists?').'</a></p>';
+				else
+					echo '<p style="font-size: 12px; opacity: .8; margin-top: 20px;"><a href="'.get_app_info('path').'/includes/list/show-hide-lists.php?hide=0&app='.get_app_info('app').'"><span class="icon icon-eye-open"></span> '._('Show hidden lists?').'</a></p>';
+			}
+		?>
     </div>   
 </div>
 <?php include('includes/footer.php');?>

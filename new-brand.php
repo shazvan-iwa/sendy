@@ -446,6 +446,13 @@
 										    //Get hostname
 											$parse = parse_url(get_app_info('path'));
 											$domain = $parse['host'];
+											
+											if($domain=='')
+											{
+												$domain_exp = explode('/', get_app_info('path'));
+												$domain = $domain_exp[2];
+											}
+											
 											echo $domain;
 											
 											//Get installation URI

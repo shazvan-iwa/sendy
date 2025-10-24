@@ -295,11 +295,14 @@
 								$unconverted_date = array('[currentdaynumber]', '[currentday]', '[currentmonthnumber]', '[currentmonth]', '[currentyear]');
 								$converted_date = array($currentdaynumber, $currentday, $currentmonthnumber, $currentmonth, $currentyear);
 								$title = str_replace($unconverted_date, $converted_date, $title);
+								
+								//Attachment icon if there are attachments
+								$paper_clip = count(glob("uploads/attachments/a$ares_email_id/*")) > 0 ? '<span class="icon icon-paper-clip"></span> ' : '';
 		          	?>
 		          	<tr id="email-<?php echo $ares_email_id;?>">
 			          <td class="cols"><?php echo $time_condition;?></td>
 		              <td>
-		              	<strong class="cols"><a href="<?php echo get_app_info('path');?>/autoresponders-report.php?i=<?php echo get_app_info('app')?>&a=<?php echo $aid;?>&ae=<?php echo $ares_email_id; ?>" style="text-decoration: none;" title="<?php echo _('View report');?>"><?php echo $title;?></a></strong><br/>
+		              	<strong class="cols"><a href="<?php echo get_app_info('path');?>/autoresponders-report.php?i=<?php echo get_app_info('app')?>&a=<?php echo $aid;?>&ae=<?php echo $ares_email_id; ?>" style="text-decoration: none;" title="<?php echo _('View report');?>"><?php echo $paper_clip.$title;?></a></strong><br/>
 		              	<div class="btns">
 		              	
 		              		<ul class="ares_email_options">

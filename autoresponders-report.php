@@ -259,6 +259,64 @@
 			<p><strong><?php echo _('Type');?></strong> <span class="label"><?php echo get_ares_type_name('type');?></span></p>
 			<p><strong><?php echo _('From');?></strong> <span class="label"><?php echo $from_name.' &lt;'.$from_email.'&gt;';?></span></p>
 			<p><strong><?php echo _('Emails sent');?></strong> <span class="label"><?php echo number_format(get_saved_data('recipients'));?> <?php echo _('subscribers');?></span></p>
+			
+			<?php 
+				if (count(glob("uploads/attachments/a$ae/*")) > 0)
+				{
+					if($handle = opendir('uploads/attachments/a'.$ae))
+					{
+						$i = -1;
+						while (false !== ($file = readdir($handle))) 
+						{
+							if($file!='.' && $file!='..'):
+				?>
+								<ul id="attachments">
+									<li id="attachment<?php echo $i;?>" <?php echo get_app_info('dark_mode') ? 'style="color:black;"' : '';?>>
+										<?php 
+											$filen = $file;
+											if(strlen($filen)>30) $filen = substr($file, 0, 30).'...';
+											echo '<a href="'.APP_PATH.'/uploads/attachments/'.$cid.'/'.$file.'" title="">'.$filen.'</a>';
+										?> 
+										(<?php echo round((filesize('uploads/attachments/a'.$ae.'/'.$file)/1000000), 2);?>MB) 
+										<a href="<?php echo get_app_info('path');?>/includes/ares/delete-attachment.php" data-filename="<?php echo $file;?>" title="<?php echo _('Delete');?>" id="delete<?php echo $i;?>" <?php echo get_app_info('dark_mode') ? 'style="color:black;"' : '';?>><i class="icon icon-trash"></i></a>
+										<script type="text/javascript">
+											$("#delete<?php echo $i?>").click(function(e){
+												e.preventDefault();
+												filename = $(this).data("filename");
+												ares_id = "<?php echo $ae?>";
+												url = $(this).attr("href");
+												c = confirm('<?php echo _('Confirm delete');?> \"'+filename+'\"?');
+												
+												if(c)
+												{
+													$.post(url, { filename: filename, ares_id: ares_id },
+													  function(data) {
+														  if(data)
+														  {
+															  $("#attachment<?php echo $i?>").fadeOut();
+														  }
+														  else
+														  {
+															  alert("<?php echo _('Sorry, unable to delete. Please try again later!');?>");
+														  }
+													  }
+													);
+												}
+											});
+										</script>
+									</li>
+								</ul>
+				<?php
+							endif;
+							
+							$i++;
+						}
+					
+						closedir($handle);
+					}
+				}
+			?>
+			
 		</blockquote>
     	
     	<div class="row-fluid">

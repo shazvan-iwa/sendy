@@ -71,7 +71,7 @@
 	
 	$sortby = $templates_lists_sorting=='date' ? 'id DESC' : 'name ASC';
 	
-	$show_hidden = $include_hidden=='yes' || $include_hidden=='true' || $include_hidden==true ? ' OR hide = 1' : '';
+	$show_hidden = $include_hidden=='yes' || $include_hidden=='true' || $include_hidden===true ? ' OR hide = 1' : '';
 	
 	//Get lists
 	$q = 'SELECT id, name FROM lists WHERE app = '.$brand_id.' AND (hide = 0 '.$show_hidden.') ORDER BY '.$sortby;

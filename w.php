@@ -260,6 +260,7 @@
 	    	else $link = $row2['link'];
 			
 			//replace new links on HTML code
+			$app_path = !isset($app_path) ? APP_PATH : $app_path;			
 	    	$html = str_replace('href="'.$link.'"', 'href="'.$app_path.'/l/'.encrypt_val($subscriber_id).'/'.encrypt_val($linkID).'/'.encrypt_val($campaign_id).'" rel="noreferrer"', $html);
 	    	$html = str_replace('href=\''.$link.'\'', 'href="'.$app_path.'/l/'.encrypt_val($subscriber_id).'/'.encrypt_val($linkID).'/'.encrypt_val($campaign_id).'" rel="noreferrer"', $html);
 	    }  

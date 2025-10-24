@@ -5,6 +5,8 @@
 	
 	$dark_mode = 0;
 	
+	$email = get_app_info('email')=='' ? '' : get_app_info('email');
+	
 	//If main user
 	if(!get_app_info('is_sub_user') && CURRENT_DOMAIN == APP_PATH_DOMAIN)
 	{
@@ -35,7 +37,7 @@
 		      $app_id = isset($row['id']) ? $row['id'] : '';
 		  }
 		}
-		if($logo_filename=='') $logo_image = 'https://www.gravatar.com/avatar/'.md5(strtolower(trim(get_app_info('email')))).'?s=36&d='.get_app_info('path').'/img/sendy-avatar.png';
+		if(empty($logo_filename)) $logo_image = 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($email))).'?s=36&d='.get_app_info('path').'/img/sendy-avatar.png';
 		else $logo_image = get_app_info('path').'/uploads/logos/'.$logo_filename;
 		
 		if($is_login_page)
@@ -129,7 +131,7 @@
 	          <!-- Check if sub user -->
 	          <?php if(!get_app_info('is_sub_user') && CURRENT_DOMAIN == APP_PATH_DOMAIN):?>
 	          
-		          <a class="brand" href="<?php echo get_app_info('path');?>/"><img src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim(get_app_info('email'))));?>?s=36&d=<?php echo get_app_info('path');?>/img/sendy-avatar.png" title="" class="main-gravatar" onerror="this.src='<?php echo get_app_info('path');?>/img/sendy-avatar.png'"/><?php echo get_app_info('company');?></a>
+		          <a class="brand" href="<?php echo get_app_info('path');?>/"><img src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($email)));?>?s=36&d=<?php echo get_app_info('path');?>/img/sendy-avatar.png" title="" class="main-gravatar" onerror="this.src='<?php echo get_app_info('path');?>/img/sendy-avatar.png'"/><?php echo get_app_info('company');?></a>
 		          
 	          <?php else:?>
 	          

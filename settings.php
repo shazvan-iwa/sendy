@@ -99,7 +99,7 @@
 				    	<?php echo _('Two-factor authentication provides an additional layer of security by requiring a one time password (OTP) in addition to email & password credentials. You can get OTP codes without an internet or cellular connection using a <a href="#two_factor_apps"data-toggle="modal" style="text-decoration:underline;">two-factor application</a>.');?>
 			    	</p><br/>
 				    <p><?php echo _('<strong>Step 1</strong>: Scan the following QR code (or enter the secret key) into your <a href="#two_factor_apps"data-toggle="modal" style="text-decoration:underline;">two-factor application</a>:');?></p>
-				    <p><img src="" id="qr-code"/></p>
+				    <p><img src="" id="qr-code" width="200" height="200"/></p>
 				    <p><strong><?php echo _('Secret key:');?></strong> <span id="secret-key"></span></p>
 				    <br/>
 				    <p><?php echo _('<strong>Step 2</strong>: Use your <a href="#two_factor_apps"data-toggle="modal" style="text-decoration:underline;">two-factor application</a> to generate an OTP code, then paste it below:');?></p>
@@ -150,7 +150,8 @@
 				    }
 			    }
 		        $issuer = get_app_info('is_sub_user') ? $main_company : 'Sendy';
-		        $qrcode = '//chart.apis.google.com/chart?cht=qr&chs=200x200&chl=otpauth://totp/'.$issuer.':'.get_app_info('email').'?secret='.$secret_key.'&issuer='.$issuer;
+		        //$qrcode = '//chart.apis.google.com/chart?cht=qr&chs=200x200&chl=otpauth://totp/'.$issuer.':'.get_app_info('email').'?secret='.$secret_key.'&issuer='.$issuer;
+		        $qrcode = 'https://qrcode.tec-it.com/API/QRCode?data=otpauth://totp/'.$issuer.':'.get_app_info('email').'?secret='.$secret_key.'&issuer='.$issuer;
 	        ?>
 	        
 	        <script type="text/javascript">
@@ -308,10 +309,10 @@
 				            </div>
 				        </div>
 				        
-				        <label class="control-label" for="aws_secret"><?php echo _('AWS Secret Access Key');?></label>
+				        <label class="control-label" for="aws_secret"><?php echo _('AWS Secret Access Key (leave blank to not change it)');?></label>
 				    	<div class="control-group">
 					    	<div class="controls">
-				              <input type="password" class="input-xlarge" id="aws_secret" name="aws_secret" placeholder="<?php echo _('AWS Secret Acesss Key');?>" value="<?php echo get_user_data('s3_secret');?>" autocomplete="off">
+				              <input type="password" class="input-xlarge" id="aws_secret" name="aws_secret" placeholder="<?php echo _('AWS Secret Acesss Key');?>" value="" autocomplete="off">
 				            </div>
 				        </div>
 				        <br/>
@@ -335,6 +336,7 @@
 					        , 'ca-central-1' => 'Canada'
 					        , 'eu-west-1' => 'Ireland'
 					        , 'eu-central-1' => 'Frankfurt'
+					        , 'eu-central-2' => 'Zurich'
 					        , 'eu-west-2' => 'London'
 					        , 'eu-south-1' => 'Milan'
 					        , 'eu-west-3' => 'Paris'
@@ -346,7 +348,9 @@
 							, 'ap-northeast-3' => 'Osaka'
 					        , 'ap-northeast-2' => 'Seoul'
 					        , 'ap-south-1' => 'Mumbai'
+					        , 'ap-south-2' => 'Hyderabad'
 					        , 'me-south-1' => 'Bahrain'
+					        , 'me-central-1' => 'UAE'
 							, 'af-south-1' => 'Cape Town'
 					        , 'sa-east-1' => 'Sao Paulo'
 					        );

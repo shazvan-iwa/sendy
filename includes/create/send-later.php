@@ -13,7 +13,7 @@
 	$email_lists_segs_excl = mysqli_real_escape_string($mysqli, $_POST['email_lists_segs_excl']);
 	$app = isset($_POST['app']) && is_numeric($_POST['app']) ? mysqli_real_escape_string($mysqli, (int)$_POST['app']) : exit;
 	$send_date = mysqli_real_escape_string($mysqli, $_POST['send_date']);
-	$total_recipients = isset($_POST['total_recipients2']) && is_numeric($_POST['total_recipients2']) ? mysqli_real_escape_string($mysqli, (int)$_POST['total_recipients2']) : exit;
+	$total_recipients = empty($_POST['total_recipients2']) ? 0 : (int)trim($_POST['total_recipients2']);
 	$hour = mysqli_real_escape_string($mysqli, $_POST['hour']);
 	$min = mysqli_real_escape_string($mysqli, $_POST['min']);
 	$ampm = mysqli_real_escape_string($mysqli, $_POST['ampm']);

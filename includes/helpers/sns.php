@@ -7,6 +7,13 @@
  * @link http://docs.amazonwebservices.com/sns/latest/api/
  */
 class AmazonSNS {
+    private $_endpoint;
+    private $parameters;
+    private $_amz_date;
+    private $_date;
+    private $_region;
+    private $_headers;
+    private $_host;
 	/** @var string $access_key */
 	private $access_key;
 	/** @var string $secret_key */

@@ -239,6 +239,7 @@
 				  			{
 				  				$label = '<span class="label">'._('Draft').'</span>';
 				  				$scheduled_title = _('Define recipients & send');
+								$sent_text = '-';
 				  			}
 				  			else
 				  			{				  				
@@ -246,6 +247,7 @@
 				  				$send_date_totime = date("D, M d, Y h:iA", $send_date);
 				  				$label = '<span class="label label-info">'._('Scheduled').'</span>';
 				  				$scheduled_title = _('Scheduled on').' '.$send_date_totime.' ('.$timezone.')';
+								$sent_text = $send_date_totime;
 				  			}
 			  			}
 			  			
@@ -325,9 +327,11 @@
 				  					//if CRON has executed the script / sending has started
 				  					if($send_date!='0' && $timezone!='0')
 				  					{
+										$paper_clip = count(glob("uploads/attachments/$id/*")) > 0 ? '<span class="icon icon-paper-clip"></span> ' : '';
+										
 					  					echo '
 					  						<tr id="'.$id.'">
-										      <td id="label'.$id.'"><span class="label label-warning">'._('Sending').'</span> <a href="'.get_app_info('path').'/report?i='.get_app_info('app').'&c='.$id.'" title="'._('Currently sending your campaign to').' '.number_format($to_send).' '._('recipients').'" style="margin-left:5px;">'.$campaign_title.'</a> ';
+										      <td id="label'.$id.'"><span class="label label-warning">'._('Sending').'</span> <a href="'.get_app_info('path').'/report?i='.get_app_info('app').'&c='.$id.'" title="'._('Currently sending your campaign to').' '.number_format($to_send).' '._('recipients').'" style="margin-left:5px;">'.$paper_clip.$campaign_title.'</a> ';
 										      
 										if(!get_app_info('cron_sending')) 
 										echo '
@@ -476,9 +480,11 @@
 				  					//CRON have not executed the sending script
 				  					else
 				  					{
+										  $paper_clip = count(glob("uploads/attachments/$id/*")) > 0 ? '<span class="icon icon-paper-clip"></span> ' : '';
+										  
 				  					echo '
 				  						<tr id="'.$id.'">
-									      <td id="label'.$id.'"><span class="label label-warning">'._('Preparing').'</span> <a href="javascript:void(0)" title="'._('Preparing to send your campaign to').' '.number_format($to_send).' '._('recipients').'" style="margin-left:5px;">'.$campaign_title.'</a>';
+									      <td id="label'.$id.'"><span class="label label-warning">'._('Preparing').'</span> <a href="javascript:void(0)" title="'._('Preparing to send your campaign to').' '.number_format($to_send).' '._('recipients').'" style="margin-left:5px;">'.$paper_clip.$campaign_title.'</a>';
 									
 									echo '
 									<span id="separator2'.$id.'">|</span> <span id="stop-sending-text"><a href="javascript:void(0)" id="stop-sending-btn-'.$id.'" class="btn" style="padding:3px 5px; font-size: 12px;" title="'._('Click to stop the campaign.').'" data-url="'.get_app_info('path').'/includes/create/stop-campaign.php" data-id="'.$id.'" data-ispreparing="1"><span class="icon icon-power-off"></span> '._('Stop').'</a></span>
@@ -611,11 +617,13 @@
 				  				
 				  			else
 				  			{
+								$paper_clip = count(glob("uploads/attachments/$id/*")) > 0 ? '<span class="icon icon-paper-clip"></span> ' : '';
+								
 				  				echo '
 					  				<tr id="'.$id.'">
-								      <td>'.$label.' <a href="'.get_app_info('path').'/send-to?i='.get_app_info('app').'&c='.$id.'" title="'.$scheduled_title.'" style="margin-left:5px;">'.$campaign_title.'</a> <span style="color:#737373;font-size:12px;">|</span> <a href="'.get_app_info('path').'/edit?i='.get_app_info('app').'&c='.$id.'" title="'._('Edit this campaign').'" style="color:#737373;font-size:12px;"> '._('Edit').'</a></td>
+								      <td>'.$label.' <a href="'.get_app_info('path').'/send-to?i='.get_app_info('app').'&c='.$id.'" title="'.$scheduled_title.'" style="margin-left:5px;">'.$paper_clip.$campaign_title.'</a> <span style="color:#737373;font-size:12px;">|</span> <a href="'.get_app_info('path').'/edit?i='.get_app_info('app').'&c='.$id.'" title="'._('Edit this campaign').'" style="color:#737373;font-size:12px;"> '._('Edit').'</a></td>
 								      <td>-</td>
-								      <td>-</td>
+								      <td>'.$sent_text.'</td>
 								      <td>-</td>
 								      <td>-</td>
 								      <td>';
@@ -664,8 +672,10 @@
 				  				<tr id="'.$id.'">
 							      '; 
 							
+							$paper_clip = count(glob("uploads/attachments/$id/*")) > 0 ? '<span class="icon icon-paper-clip"></span> ' : '';
+							
 							if(!get_app_info('is_sub_user') || (get_app_info('is_sub_user') && get_app_info('reports_only')==0))
-								echo '<td><span class="label label-success">'._('Sent').'</span></a> <a href="'.get_app_info('path').'/report?i='.get_app_info('app').'&c='.$id.'" title="'._('View report for this campaign').'" style="margin-left:5px;">'.$campaign_title.'</a>'.$download_errors.'</td>'; 
+								echo '<td><span class="label label-success">'._('Sent').'</span></a> <a href="'.get_app_info('path').'/report?i='.get_app_info('app').'&c='.$id.'" title="'._('View report for this campaign').'" style="margin-left:5px;">'.$paper_clip.$campaign_title.'</a>'.$download_errors.'</td>'; 
 							else
 								echo '<td><span class="label label-success">'._('Sent').'</span></a> '.$campaign_title.''.$download_errors.'</td>'; 
 							

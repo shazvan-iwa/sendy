@@ -70,7 +70,7 @@
 				$r2 = mysqli_query($mysqli, $q2);
 				if (mysqli_num_rows($r2) == 0)
 				{
-					$q = 'UPDATE subscribers SET email = "'.$email.'" WHERE id = '.$subscriber_id;
+					$q = 'UPDATE subscribers SET email = "'.$email.'", unsubscribed = 0, bounced = 0, bounce_soft = 0, complaint = 0 WHERE id = '.$subscriber_id;
 					$r = mysqli_query($mysqli, $q);
 					if ($r) echo true;
 					else echo _('Oops! Unable to save, please try again later.');
@@ -124,10 +124,14 @@
 			    {
 			    	if($lcf_array[1]=='Date')
 			    	{
-				    	$date_value1 = strtotime($post_custom_field);
-						$date_value2 = date("M d, Y 12\a\m", $date_value1);
-						$val = strtotime($date_value2);
-						$cf_vals .= $val;
+						if($post_custom_field != '')
+						{
+				    		$date_value1 = strtotime($post_custom_field);
+							$date_value2 = date("M d, Y 12\a\m", $date_value1);
+							$val = strtotime($date_value2);
+							$cf_vals .= $val;
+						}
+						else $cf_vals .= '';
 			    	}
 			    	else
 				    	$cf_vals .= $post_custom_field;

@@ -87,6 +87,19 @@
 			$campaign_id = $return_boolean!='' ? decrypt_int($return_boolean) : '';
 		}
 		
+		//Check if user set "double opt-out" in the list settings
+		$q = 'SELECT unsubscribe_confirm FROM lists WHERE id = '.$list_id;
+		$r = mysqli_query($mysqli, $q);
+		if ($r) while($row = mysqli_fetch_array($r)) $unsubscribe_confirm = $row['unsubscribe_confirm'];
+		
+		//If the list is set to 'Double opt-out', List-Unsubscribe will bypass that.
+		if($unsubscribe_confirm && isset($_POST['List-Unsubscribe']) && strtolower($_POST['List-Unsubscribe'])=="one-click") 
+		{
+			//Unsubscribe and bypass 'Double opt-out'
+			header('Location: '.$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].'/'.$_SERVER['REQUEST_URI'].'&confirm'); 
+			exit;
+		}
+		
 		//Set language
 		$q = 'SELECT login.language FROM lists, login WHERE lists.id = '.$list_id.' AND login.app = lists.app';
 		$r = mysqli_query($mysqli, $q);
@@ -205,11 +218,6 @@
 			$custom_fields = $row['custom_fields'];
 		}
 	}
-	
-	//Check if user set "double opt-out" in the list settings
-	$q = 'SELECT unsubscribe_confirm FROM lists WHERE id = '.$list_id;
-	$r = mysqli_query($mysqli, $q);
-	if ($r) while($row = mysqli_fetch_array($r)) $unsubscribe_confirm = $row['unsubscribe_confirm'];
 	
 	//If user wants "double opt-out"	, ask recipient to confirm unsubscription
 	if($unsubscribe_confirm && $return_boolean!='true')
@@ -384,7 +392,7 @@ if($return_boolean=='true'):
 	echo true;
 else:
 	//if user sets a redirection URL
-	if($unsubscribed_url != ''):
+	if(!empty($unsubscribed_url)):
 		$unsubscribed_url = str_replace('%e', urlencode($email), $unsubscribed_url);
 		$unsubscribed_url = str_replace('%l', encrypt_val($list_id), $unsubscribed_url);
 		$unsubscribed_url = str_replace('%s', $app_path.'/subscribe/'.encrypt_val($email).'/'.encrypt_val($list_id), $unsubscribed_url);

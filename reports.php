@@ -190,9 +190,11 @@
 				  			else
 				  				$download_errors = '';
 				  				
+						 	$paper_clip = count(glob("uploads/attachments/$id/*")) > 0 ? '<span class="icon icon-paper-clip"></span> ' : '';
+							 
 				  			echo '
 				  				<tr id="'.$id.'">
-							      <td><i class="icon icon-bar-chart" style="margin-right:3px;"></i> <a href="'.get_app_info('path').'/report?i='.get_app_info('app').'&c='.$id.'" title="">'.$campaign_title.'</a>'.$download_errors.'</td>
+							      <td><i class="icon icon-bar-chart" style="margin-right:3px;"></i> <a href="'.get_app_info('path').'/report?i='.get_app_info('app').'&c='.$id.'" title="">'.$paper_clip.$campaign_title.'</a>'.$download_errors.'</td>
 							      <td>'.number_format($recipients).'</td>
 							      <td>'.parse_date($sent, 'long', true).'</td>
 							      <td><span class="label label-success">'.$open_data.'</td>

@@ -389,7 +389,7 @@
 						<?php if(have_segments()):?>
 							<optgroup label="<?php echo _('Segments');?>">
 							<?php 
-								$q = 'SELECT id, name, list FROM seg WHERE app = '.get_app_info('app');
+								$q = 'SELECT id, name, list FROM seg WHERE app = '.get_app_info('app').' ORDER BY '.$sortby;
 								$r = mysqli_query($mysqli, $q);
 								if ($r && mysqli_num_rows($r) > 0)
 								{
@@ -495,7 +495,7 @@
 						<?php if(have_segments()):?>
 							<optgroup label="<?php echo _('Segments');?>">
 							<?php 
-								$q = 'SELECT id, name, list FROM seg WHERE app = '.get_app_info('app');
+								$q = 'SELECT id, name, list FROM seg WHERE app = '.get_app_info('app').' ORDER BY '.$sortby;
 								$r = mysqli_query($mysqli, $q);
 								if ($r && mysqli_num_rows($r) > 0)
 								{
@@ -1079,7 +1079,7 @@
 	    	<p><strong><?php echo _('Clicks tracking');?></strong> <?php echo $links_tracking;?></p>
 	    	<p><strong><?php echo _('Web version').$web_version_lang_name;?></strong> <a href="<?php echo $web_version;?>" target="_blank" title="<?php echo _('View web version link');?>"><span class="label" id="webversion_url"><?php echo $web_version;?></span></a></p>
 	    	<?php 
-		        if (file_exists('uploads/attachments/'.$cid))
+		        if (count(glob("uploads/attachments/$cid/*")) > 0)
 				{
 					echo '<p><strong>'._('Attachments').'</strong>';
 					if($handle = opendir('uploads/attachments/'.$cid))
@@ -1094,7 +1094,7 @@
 										<?php 
 											$filen = $file;
 											if(strlen($filen)>30) $filen = substr($file, 0, 30).'...';
-											echo $filen;
+											echo '<a href="'.APP_PATH.'/uploads/attachments/'.$cid.'/'.$file.'" title="">'.$filen.'</a>';
 										?> 
 										(<?php echo round((filesize('uploads/attachments/'.$cid.'/'.$file)/1000000), 2);?>MB) 
 										<a href="<?php echo get_app_info('path');?>/includes/create/delete-attachment.php" data-filename="<?php echo $file;?>" title="<?php echo _('Delete');?>" id="delete<?php echo $i;?>" <?php echo get_app_info('dark_mode') ? 'style="color:black;"' : '';?>><i class="icon icon-trash"></i></a>

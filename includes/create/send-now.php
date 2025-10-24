@@ -16,7 +16,7 @@ $email_list = $_POST['email_list']!='' ? mysqli_real_escape_string($mysqli, $_PO
 $email_list_excl = $_POST['email_list_exclude']!='' ? mysqli_real_escape_string($mysqli, $_POST['email_list_exclude']) : 0;
 $email_lists_segs = $_POST['email_lists_segs']!='' ? mysqli_real_escape_string($mysqli, $_POST['email_lists_segs']) : 0;
 $email_lists_segs_excl = $_POST['email_lists_segs_excl']!='' ? mysqli_real_escape_string($mysqli, $_POST['email_lists_segs_excl']) : 0;
-$total_recipients = isset($_POST['total_recipients']) && is_numeric($_POST['total_recipients']) ? mysqli_real_escape_string($mysqli, $_POST['total_recipients']) : 0;
+$total_recipients = empty($_POST['total_recipients']) ? 0 : (int)trim($_POST['total_recipients']);
 $time = time();
 
 //Remove ONLY_FULL_GROUP_BY from sql_mode
@@ -351,7 +351,7 @@ if ($r && mysqli_num_rows($r) > 0)
 		}
     	
     	$subscriber_id = $row['id'];
-		$name = trim($row['name']);
+		$name = ucfirst(trim($row['name']));
 		$email = trim($row['email']);
 		$subscriber_list = $row['list'];
 		$custom_values = $row['custom_fields'];
@@ -409,7 +409,7 @@ if ($r && mysqli_num_rows($r) > 0)
 				if($name=='')
 					$title_treated = str_replace($tag, $fallback, $title_treated);
 				else
-					$title_treated = str_replace($tag, $row[strtolower($field)], $title_treated);
+					$title_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $title_treated);
 			}
 			else //if not 'Name', it's a custom field
 			{
@@ -483,7 +483,7 @@ if ($r && mysqli_num_rows($r) > 0)
 				if($name=='')
 					$html_treated = str_replace($tag, $fallback, $html_treated);
 				else
-					$html_treated = str_replace($tag, $row[strtolower($field)], $html_treated);
+					$html_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $html_treated);
 			}
 			else //if not 'Name', it's a custom field
 			{
@@ -556,7 +556,7 @@ if ($r && mysqli_num_rows($r) > 0)
 				if($name=='')
 					$plain_treated = str_replace($tag, $fallback, $plain_treated);
 				else
-					$plain_treated = str_replace($tag, $row[strtolower($field)], $plain_treated);
+					$plain_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $plain_treated);
 			}
 			else //if not 'Name', it's a custom field
 			{
@@ -695,7 +695,9 @@ if ($r && mysqli_num_rows($r) > 0)
 		$mail->IsHTML(true);
 		$mail->AddAddress($email, $name);
 		$mail->AddReplyTo($reply_to, $from_name);
+		$mail->AddCustomHeader('List-Unsubscribe-Post: List-Unsubscribe=One-Click');
 		$mail->AddCustomHeader('List-Unsubscribe: <'.APP_PATH.'/unsubscribe/'.encrypt_val($email).'/'.encrypt_val($subscriber_list).'/'.encrypt_val($campaign_id).'>');
+		$mail->AddCustomHeader('Precedence: Bulk');
 		//check if attachments are available for this campaign to attach
 		if(file_exists('../../uploads/attachments/'.$campaign_id))
 		{

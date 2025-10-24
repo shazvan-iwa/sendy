@@ -62,9 +62,7 @@ foreach ($csv->data as $key => $line)
 	}
 	else
 	{
-		// fix php 8.2 => filter_var() (thanks Michele Biasizzo)
 		foreach($line as $val) {
-			$val = filter_var($val, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
 			array_push($linearray, $val);
 		}
 		$columns = count($linearray);
@@ -139,6 +137,10 @@ foreach ($csv->data as $key => $line)
 		
 		exit;
 	}
+	
+	//Trim Unicode white spaces
+	$linearray[0] = preg_replace('/^\p{Z}+|\p{Z}+$/u', '', $linearray[0]);
+	$linearray[1] = preg_replace('/^\p{Z}+|\p{Z}+$/u', '', $linearray[1]);
 	
 	//If cron is NOT setup, import immediately. Start by checking for duplicates
 	$q = 'SELECT custom_fields FROM subscribers WHERE list = '.$listID.' AND (email = "'.$linearray[0].'" || email = "'.trim($linearray[1]).'") AND userID = '.$userID;

@@ -31,11 +31,229 @@
     	</div>
     	<h2><?php echo _('Search all lists');?></h2> <br/>
 		
-		<div class="well">
-			<p><?php echo _('Keyword');?>: <span class="label label-info"><?php echo htmlentities($s);?></span> | Results <span class="label label-info" id="results-count"></span> <a href="<?php echo get_app_info('path')?>/list?i=<?php echo get_app_info('app');?>" title="" style="float:right;"><i class="icon icon-double-angle-left"></i> <?php echo _('Back to lists');?></a></p>
+		<div class="well">			
+			<p><?php echo _('Keyword');?>: <span class="label label-info"><?php echo htmlentities($s);?></span> | Results <span class="label label-info" id="results-count-lists"></span> <span class="label label-info" id="results-count"></span></p>
+			
+			<div style="float: right; margin-top: -34px">
+				<form class="form-search" action="<?php echo get_app_info('path');?>/search-all-lists" method="GET" style="float:right;">
+					<input type="hidden" name="i" value="<?php echo get_app_info('app');?>">
+					<input type="text" class="input-medium search-query" id="search-field" name="s" style="width: 200px;">
+					<button type="submit" class="btn"><i class="icon-search"></i> <?php echo _('Search all lists');?></button>
+				</form>
+				
+				<a href="<?php echo get_app_info('path')?>/list?i=<?php echo get_app_info('app');?>" title="" style="float:right; margin: 5px 15px 0 0"><i class="icon icon-double-angle-left"></i> <?php echo _('Back to lists');?></a>
+			</div>
 		</div>
 		
 		<br/>
+		
+		<div>
+			<h3 style="margin: 0 0 10px 5px;">Lists</h3>
+		</div>
+		
+		<?php $has_gdpr_subscribers = has_gdpr_subscribers(); ?>
+		
+		<table class="table table-striped responsive" style="margin-bottom: 30px;">
+		  <thead>
+			<tr>
+			  <th><?php echo _('ID');?></th>
+			  <th><?php echo _('List');?></th>
+			  <th><?php echo _('Active');?></th>
+			  <?php if($has_gdpr_subscribers):?>
+			  <th><?php echo _('GDPR');?></th>
+			  <?php endif;?>
+			  <th><?php echo _('Hide');?></th>
+			  <th><?php echo _('Edit');?></th>
+			  <th><?php echo _('Delete');?></th>
+			</tr>
+		  </thead>
+		  <tbody>
+			  
+			  <!-- Auto select encrypted listID -->
+			  <script type="text/javascript">
+				  $(document).ready(function() {
+					$(".encrypted-list-id").mouseover(function(){
+						$(this).selectText();
+					});
+					
+					$("#search-field").focus();
+					$('#search-field').val('').val("<?php echo $s;?>");
+				});
+			</script>
+			
+			<?php 
+				//Get sorting preference and whether to show hidden lists
+				$q = 'SELECT templates_lists_sorting, hide_lists, opt_in FROM apps WHERE id = '.get_app_info('app');
+				$r = mysqli_query($mysqli, $q);
+				if ($r && mysqli_num_rows($r) > 0) 
+				{
+					while($row = mysqli_fetch_array($r)) 
+					{
+						$templates_lists_sorting = $row['templates_lists_sorting'];
+						$hide_lists = $row['hide_lists'];
+						$opt_in = $row['opt_in'];
+					}
+				}
+				$sortby = $templates_lists_sorting=='date' ? 'id DESC' : 'name ASC';
+				$show_hidden_lists = $hide_lists == 0 ? '' : 'AND hide = 0';
+			?>
+			  
+			  <?php 
+				  
+				  $q = 'SELECT id, name, hide FROM lists WHERE app = '.get_app_info('app').' AND userID = '.get_app_info('main_userID').' AND name LIKE "%'.$s.'%" '.$show_hidden_lists.' ORDER BY '.$sortby;
+				  $r = mysqli_query($mysqli, $q);
+				  $number_of_lists = mysqli_num_rows($r) > 1 ? mysqli_num_rows($r).' '._('lists') : mysqli_num_rows($r).' '._('list');
+				  echo '
+				  	<script type="text/javascript">
+				  	$(document).ready(function() {
+					  	$("#results-count-lists").text("'.$number_of_lists.'");
+				  	});
+					</script>
+				  ';
+				  if ($r && mysqli_num_rows($r) > 0)
+				  {
+					  while($row = mysqli_fetch_array($r))
+					  {
+						  $id = $row['id'];
+						  $name = stripslashes($row['name']);
+						  $hidden = stripslashes($row['hide']);
+						  $subscribers_count = get_subscribers_count($id);
+						  if(strlen(encrypt_val($id))>5) $listid = substr(encrypt_val($id), 0, 5).'..';
+						  else $listid = encrypt_val($id);
+						  
+						$is_hidden = $hidden ? '.5' : '1';
+						$icon_eye = $hidden ? 'icon-eye-open' : 'icon-eye-close';
+						$hide_unhide_title = $hidden ? _('Unhide this list') : _('Hide this list');
+						$to_hide = $hidden ? 0 : 1;
+						  
+						  echo '
+						  
+						  <tr id="'.$id.'" style="opacity: '.$is_hidden.'">
+							<td><span class="label" id="list'.$id.'">'.$listid.'</span><span class="label encrypted-list-id" id="list'.$id.'-encrypted" style="display:none;">'.encrypt_val($id).'</span></td>
+						  <td><a href="'.get_app_info('path').'/subscribers?i='.get_app_info('app').'&l='.$id.'" title="">'.$name.'</a></td>
+						  <td id="progress'.$id.'"><span class="badge badge-success">'.$subscribers_count.'</span></td>';
+						  
+						if($has_gdpr_subscribers)
+						{
+							$gdpr_count = get_gdpr_count($id);
+							$gdpr_percentage = get_gdpr_percentage($id, $gdpr_count);
+							echo '<td><span class="label label-warning">'.$gdpr_percentage.'%</span> '.$gdpr_count.'</td>';
+						}
+						  
+						echo '
+						  <td><a href="includes/list/hide-list.php" id="hide-btn-'.$id.'" title="'.$hide_unhide_title.'" data-l="'.$id.'" data-hide="'.$to_hide.'"><i class="icon '.$icon_eye.'"></i></a></td>
+						  <td><a href="edit-list?i='.get_app_info('app').'&l='.$id.'" title="'._('List settings').'"><i class="icon icon-pencil"></i></a></td>
+						  <td><a href="#delete-list" title="'._('Delete').' '.$name.'" id="delete-btn-'.$id.'" data-toggle="modal"><span class="icon icon-trash"></span></a></td>
+						  <script type="text/javascript">
+							  $("#hide-btn-'.$id.'").click(function(e){
+								e.preventDefault(); 
+								$.post($(this).attr("href"), {l:$(this).data("l"), hide:$(this).attr("data-hide")},
+									function(data) 
+									{
+										if(data==1) 
+										{
+											$("#'.$id.'").css("opacity", "0.5");
+											$("#hide-btn-'.$id.'").html("<i class=\"icon icon-eye-open\"></i>");
+											$("#hide-btn-'.$id.'").attr("title", "'._('Unhide this list').'");
+											$("#hide-btn-'.$id.'").attr("data-hide", 0);
+											to_hide = 0;
+										}
+										else 
+										{
+											$("#'.$id.'").css("opacity", "1");
+											$("#hide-btn-'.$id.'").html("<i class=\"icon icon-eye-close\"></i>");
+											$("#hide-btn-'.$id.'").attr("title", "'._('Hide this list').'");
+											$("#hide-btn-'.$id.'").attr("data-hide", 1);
+											to_hide = 1;
+										}
+									}
+								);
+							});
+							$("#delete-btn-'.$id.'").click(function(e){
+								e.preventDefault(); 
+								$("#delete-list-btn").attr("data-id", '.$id.');
+								$("#list-to-delete").text("'.$name.'");
+								$("#delete-text").val("");
+							});
+							$("#list'.$id.'").mouseover(function(){
+								$("#list'.$id.'-encrypted").show();
+								$(this).hide();
+							});
+							$("#list'.$id.'-encrypted").mouseout(function(){
+								$(this).hide();
+								$("#list'.$id.'").show();
+							});
+							</script>
+						</tr>
+						  ';
+					  }  
+				  }
+				  else
+				  {
+					  echo '
+						  <tr>
+							  <td>'._('No lists found.').'</td>
+							  <td></td>
+							  <td></td>
+							  <td></td>
+							  <td></td>
+							  <td></td>
+						  </tr>
+					  ';
+				  }
+			  ?>
+			
+		  </tbody>
+		</table>	
+		
+		<!-- Delete -->
+		<div id="delete-list" class="modal hide fade">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h3><?php echo _('Delete list');?></h3>
+		  </div>
+		  <div class="modal-body">
+			<p><?php echo _('All subscribers, custom fields, autoresponders and segments in this list will be permanently deleted. Confirm delete <span id="list-to-delete" style="font-weight:bold;"></span>?');?></p>
+		  </div>
+		  <div class="modal-footer">
+			<?php if(get_app_info('strict_delete')):?>
+			<input autocomplete="off" type="text" class="input-large" id="delete-text" name="delete-text" placeholder="<?php echo _('Type the word');?> DELETE" style="margin: -2px 7px 0 0;"/>
+			<?php endif;?>
+			
+			<a href="javascript:void(0)" id="delete-list-btn" data-id="" class="btn btn-primary"><?php echo _('Delete');?></a>
+		  </div>
+		</div>
+		
+		<script type="text/javascript">
+			$("#delete-list-btn").click(function(e){
+				e.preventDefault(); 
+				
+				<?php if(get_app_info('strict_delete')):?>
+				if($("#delete-text").val()=='DELETE'){
+				<?php endif;?>
+				
+					$.post("includes/list/delete.php", { list_id: $(this).attr("data-id") },
+					  function(data) {
+						  if(data)
+						  {
+							$("#delete-list").modal('hide');
+							$("#"+$("#delete-list-btn").attr("data-id")).fadeOut(); 
+						  }
+						  else alert("<?php echo _('Sorry, unable to delete. Please try again later!')?>");
+					  }
+					);
+				
+				<?php if(get_app_info('strict_delete')):?>
+				}
+				else alert("<?php echo _('Type the word');?> DELETE");
+				<?php endif;?>
+			});
+		</script>
+		
+		
+		<div>
+			<h3 style="margin: 0 0 10px 5px;">Subscribers</h3>
+		</div>
 		
 	    <table class="table table-striped table-condensed responsive">
 		  <thead>
@@ -50,10 +268,11 @@
 		    </tr>
 		  </thead>
 		  <tbody>		  	
-		  	<?php		  		
+		  	<?php
 		  		$q = 'SELECT subscribers.id, subscribers.name, subscribers.email, subscribers.unsubscribed, subscribers.bounced, subscribers.complaint, subscribers.confirmed, subscribers.list, subscribers.timestamp FROM subscribers, lists WHERE (subscribers.name LIKE "%'.$s.'%" OR subscribers.email LIKE "%'.$s.'%" OR subscribers.custom_fields LIKE "%'.$s.'%" OR subscribers.notes LIKE "%'.$s.'%") AND lists.app = '.get_app_info('app').' AND lists.id = subscribers.list ORDER BY subscribers.timestamp DESC';
 			  	$r = mysqli_query($mysqli, $q);
 			  	$number_of_results = mysqli_num_rows($r);
+				$number_of_results = mysqli_num_rows($r) > 1 ? mysqli_num_rows($r).' '._('subscribers') : mysqli_num_rows($r).' '._('subscriber');
 			  	echo '
 			  	<script type="text/javascript">
 			  	$(document).ready(function() {
@@ -61,7 +280,7 @@
 			  	});
 			    </script>
 			  	';
-			  	if ($r && $number_of_results > 0)
+			  	if ($r && mysqli_num_rows($r) > 0)
 			  	{
 			  	    while($row = mysqli_fetch_array($r))
 			  	    {
@@ -85,7 +304,11 @@
 				  			$unsubscribed = '<span class="label label-inverse">'._('Marked as spam').'</span>';
 				  		if($confirmed==0)
 			  				$unsubscribed = '<span class="label">'._('Unconfirmed').'</span>';
-				  			
+						if($confirmed==0 && $bounced==1)
+							$unsubscribed = '<span class="label label-inverse">'._('Bounced').'</span>';
+						if($confirmed==0 && $complaint==1)
+							$unsubscribed = '<span class="label label-inverse">'._('Marked as spam').'</span>';
+				  		
 				  		if($name=='')
 				  			$name = '['._('No name').']';
 			  			

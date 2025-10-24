@@ -58,7 +58,17 @@
     	<h2><?php echo _('All campaigns');?></h2><br/>
     	
     	<div class="well">
-			<p><?php echo _('Keyword');?>: <span class="label label-info"><?php echo htmlentities($s);?></span> | Results <span class="label label-info" id="results-count"></span> <a href="<?php echo get_app_info('path')?>/app?i=<?php echo get_app_info('app');?>" title="" style="float:right;"><i class="icon icon-double-angle-left"></i> <?php echo _('Back to campaigns');?></a></p>
+			<p><?php echo _('Keyword');?>: <span class="label label-info"><?php echo htmlentities($s);?></span> | Results <span class="label label-info" id="results-count"></span></p>
+			
+			<div style="float: right; margin-top: -34px">
+				<form class="form-search" action="<?php echo get_app_info('path');?>/search-campaigns" method="GET" style="float:right;">
+					<input type="hidden" name="i" value="<?php echo get_app_info('app');?>">
+					<input type="text" class="input-medium search-query" id="search-field" name="s" style="width: 200px;">
+					<button type="submit" class="btn"><i class="icon-search"></i> <?php echo _('Search campaigns');?></button>
+				</form>
+				
+				<a href="<?php echo get_app_info('path')?>/app?i=<?php echo get_app_info('app');?>" title="" style="float:right; margin: 5px 15px 0 0"><i class="icon icon-double-angle-left"></i> <?php echo _('Back to campaigns');?></a>
+			</div>
 		</div>
     	
     	<br/>
@@ -86,6 +96,9 @@
 			  	$(document).ready(function() {
 			  		$("#results-count").text("'.$number_of_results.'");
 			  	});
+				  
+				$("#search-field").focus();
+				$("#search-field").val("").val("'.$s.'");
 			    </script>
 			  	';
 			  	if ($r && $number_of_results > 0)

@@ -65,9 +65,8 @@
 	    }  
 	}
 	
-	$today = time();
-	
 	//Current date & time
+	$today = time();
 	if($user_timezone!='') date_default_timezone_set($user_timezone);
 	$time = round($today/60)*60;
 	$current_day = date("d", $time);
@@ -78,10 +77,12 @@
 	$current_time = strtotime($current_day.' '.$current_month.' '.$current_year.' '.$current_hour.$current_mins.'H');
 	
 	//convert date tags
+	$day_word = array(_('Sunday'), _('Monday'), _('Tuesday'), _('Wednesday'), _('Thursday'), _('Friday'), _('Saturday'));
+	$month_word = array('', _('January'), _('February'), _('March'), _('April'), _('May'), _('June'), _('July'), _('August'), _('September'), _('October'), _('November'), _('December'));
 	$currentdaynumber = date('d', $today);
-	$currentday = date('l', $today);
+	$currentday = $day_word[date('w', $today)];
 	$currentmonthnumber = date('m', $today);
-	$currentmonth = date('F', $today);
+	$currentmonth = $currentmonthnumber==10 ? $month_word[$currentmonthnumber] : $month_word[str_replace('0', '', $currentmonthnumber)];
 	$currentyear = date('Y', $today);
 	$unconverted_date = array('[currentdaynumber]', '[currentday]', '[currentmonthnumber]', '[currentmonth]', '[currentyear]');
 	$converted_date = array($currentdaynumber, $currentday, $currentmonthnumber, $currentmonth, $currentyear);
@@ -238,7 +239,7 @@
 			    while($row = mysqli_fetch_array($r2))
 			    {
 			    	$subscriber_id = $row['id'];
-					$name = $row['name']=='' ? '' : stripslashes($row['name']);
+					$name = $row['name']=='' ? '' : ucfirst(stripslashes($row['name']));
 					$email = $row['email']=='' ? '' : stripslashes($row['email']);
 					$custom_fields = $row['custom_fields']=='' ? '' : stripslashes($row['custom_fields']);
 					$custom_values = $row['custom_fields']=='' ? '' : stripslashes($row['custom_fields']);
@@ -311,7 +312,7 @@
 									if($name=='')
 										$title_treated = str_replace($tag, $fallback, $title_treated);
 									else
-										$title_treated = str_replace($tag, $row[strtolower($field)], $title_treated);
+										$title_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $title_treated);
 								}
 								else //if not 'Name', it's a custom field
 								{
@@ -385,7 +386,7 @@
 									if($name=='')
 										$html_treated = str_replace($tag, $fallback, $html_treated);
 									else
-										$html_treated = str_replace($tag, $row[strtolower($field)], $html_treated);
+										$html_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $html_treated);
 								}
 								else //if not 'Name', it's a custom field
 								{
@@ -458,7 +459,7 @@
 									if($name=='')
 										$plain_treated = str_replace($tag, $fallback, $plain_treated);
 									else
-										$plain_treated = str_replace($tag, $row[strtolower($field)], $plain_treated);
+										$plain_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $plain_treated);
 								}
 								else //if not 'Name', it's a custom field
 								{
@@ -589,6 +590,7 @@
 							$mail->IsHTML(true);
 							$mail->AddAddress($email, $name);
 							$mail->AddReplyTo($reply_to, $from_name);
+							$mail->AddCustomHeader('List-Unsubscribe-Post: List-Unsubscribe=One-Click');
 							$mail->AddCustomHeader('List-Unsubscribe: <'.$app_path.'/unsubscribe/'.encrypt_val($email).'/'.encrypt_val($list).'/'.encrypt_val($ares_id).'/a>');
 							$server_path_array = explode('autoresponders.php', $_SERVER['SCRIPT_FILENAME']);
 						    $server_path = $server_path_array[0];
@@ -775,9 +777,9 @@
 				$custom_fields = '';
 				
 			    while($row = mysqli_fetch_array($r2))
-			    {		
+			    {
 			    	$subscriber_id = $row['id'];
-					$name = $row['name']=='' ? '' : stripslashes($row['name']);
+					$name = $row['name']=='' ? '' : ucfirst(stripslashes($row['name']));
 					$email = $row['email']=='' ? '' : stripslashes($row['email']);
 					$custom_fields = $row['custom_fields']=='' ? '' : stripslashes($row['custom_fields']);
 					$custom_values = $row['custom_fields']=='' ? '' : stripslashes($row['custom_fields']);
@@ -867,7 +869,7 @@
 												if($name=='')
 													$title_treated = str_replace($tag, $fallback, $title_treated);
 												else
-													$title_treated = str_replace($tag, $row[strtolower($field)], $title_treated);
+													$title_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $title_treated);
 											}
 											else //if not 'Name', it's a custom field
 											{
@@ -941,7 +943,7 @@
 												if($name=='')
 													$html_treated = str_replace($tag, $fallback, $html_treated);
 												else
-													$html_treated = str_replace($tag, $row[strtolower($field)], $html_treated);
+													$html_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $html_treated);
 											}
 											else //if not 'Name', it's a custom field
 											{
@@ -1014,7 +1016,7 @@
 												if($name=='')
 													$plain_treated = str_replace($tag, $fallback, $plain_treated);
 												else
-													$plain_treated = str_replace($tag, $row[strtolower($field)], $plain_treated);
+													$plain_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $plain_treated);
 											}
 											else //if not 'Name', it's a custom field
 											{
@@ -1145,6 +1147,7 @@
 										$mail->IsHTML(true);
 										$mail->AddAddress($email, $name);
 										$mail->AddReplyTo($reply_to, $from_name);
+										$mail->AddCustomHeader('List-Unsubscribe-Post: List-Unsubscribe=One-Click');
 										$mail->AddCustomHeader('List-Unsubscribe: <'.$app_path.'/unsubscribe/'.encrypt_val($email).'/'.encrypt_val($list).'/'.encrypt_val($ares_id).'/a>');
 										$server_path_array = explode('autoresponders.php', $_SERVER['SCRIPT_FILENAME']);
 									    $server_path = $server_path_array[0];
@@ -1337,7 +1340,7 @@
 			    while($row = mysqli_fetch_array($r2))
 			    {
 			    	$subscriber_id = $row['id'];
-					$name = $row['name']=='' ? '' : stripslashes($row['name']);
+					$name = $row['name']=='' ? '' : ucfirst(stripslashes($row['name']));
 					$email = $row['email']=='' ? '' : stripslashes($row['email']);
 					$custom_fields = $row['custom_fields']=='' ? '' : stripslashes($row['custom_fields']);
 					$custom_values = $row['custom_fields']=='' ? '' : stripslashes($row['custom_fields']);
@@ -1427,7 +1430,7 @@
 												if($name=='')
 													$title_treated = str_replace($tag, $fallback, $title_treated);
 												else
-													$title_treated = str_replace($tag, $row[strtolower($field)], $title_treated);
+													$title_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $title_treated);
 											}
 											else //if not 'Name', it's a custom field
 											{
@@ -1501,7 +1504,7 @@
 												if($name=='')
 													$html_treated = str_replace($tag, $fallback, $html_treated);
 												else
-													$html_treated = str_replace($tag, $row[strtolower($field)], $html_treated);
+													$html_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $html_treated);
 											}
 											else //if not 'Name', it's a custom field
 											{
@@ -1574,7 +1577,7 @@
 												if($name=='')
 													$plain_treated = str_replace($tag, $fallback, $plain_treated);
 												else
-													$plain_treated = str_replace($tag, $row[strtolower($field)], $plain_treated);
+													$plain_treated = str_replace($tag, ucfirst($row[strtolower($field)]), $plain_treated);
 											}
 											else //if not 'Name', it's a custom field
 											{
@@ -1705,6 +1708,7 @@
 										$mail->IsHTML(true);
 										$mail->AddAddress($email, $name);
 										$mail->AddReplyTo($reply_to, $from_name);
+										$mail->AddCustomHeader('List-Unsubscribe-Post: List-Unsubscribe=One-Click');
 										$mail->AddCustomHeader('List-Unsubscribe: <'.$app_path.'/unsubscribe/'.encrypt_val($email).'/'.encrypt_val($list).'/'.encrypt_val($ares_id).'/a>');
 										$server_path_array = explode('autoresponders.php', $_SERVER['SCRIPT_FILENAME']);
 									    $server_path = $server_path_array[0];

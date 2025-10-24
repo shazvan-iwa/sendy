@@ -147,32 +147,41 @@
 		</form>
     	
     	<br/><br/>
-    	<p class="well"><?php echo _('List');?>: <a href="<?php echo get_app_info('path');?>/subscribers?i=<?php echo get_app_info('app');?>&l=<?php echo $lid;?>" title=""><span class="label label-info"><?php echo get_lists_data('name', $lid);?></span></a> | <a href="<?php echo get_app_info('path')?>/list?i=<?php echo get_app_info('app');?>" title=""><?php echo _('Back to lists');?></a>
-    	<a href="<?php echo get_app_info('path');?>/edit-list?i=<?php echo get_app_info('app');?>&l=<?php echo $lid;?>" style="float:right;"><i class="icon-wrench"></i> <?php echo _('List settings');?></a>
-    	<a href="#subscribeform" style="float:right;margin-right:20px;" data-toggle="modal"><i class="icon-list-alt"></i> <?php echo _('Subscribe form');?></a>
-    	
-    	
-    	<span class="badge" style="float:right;margin:0 20px 0 -15px;"><?php echo get_segments_count();?></span>
-    	<a href="<?php echo get_app_info('path');?>/segments-list?i=<?php echo get_app_info('app');?>&l=<?php echo $lid;?>" style="float:right;margin-right:20px;"><i class="icon-filter"></i> <?php echo _('Segments');?></a>
-    	
-    	<?php 
-	    	$q = 'SELECT cron_ares FROM login WHERE id = '.get_app_info('main_userID');
-	    	$r = mysqli_query($mysqli, $q);
-	    	if ($r)
-	    	{
-	    	    while($row = mysqli_fetch_array($r)) 
-	    	    	$cron_ares = $row['cron_ares'];
-	    	}	    	
-	    	if($cron_ares):
-    	?>    	
-    	<span class="badge" style="float:right;margin:0 20px 0 -15px;"><?php echo get_autoresponder_count();?></span>
-    	<a href="<?php echo get_app_info('path');?>/autoresponders-list?i=<?php echo get_app_info('app');?>&l=<?php echo $lid;?>" style="float:right;margin-right:20px;"><i class="icon-time"></i> <?php echo _('Autoresponders');?></a>
-    	<?php else:?>
-    	<a href="#ares_cron" style="float:right;margin-right:20px;" data-toggle="modal"><i class="icon-time"></i> <?php echo _('Autoresponders');?></a>
-    	<?php endif;?>
-    	<span class="badge" style="float:right;margin:0 20px 0 -15px;"><?php echo get_custom_fields_count();?></span>
-    	<a href="<?php echo get_app_info('path');?>/custom-fields?i=<?php echo get_app_info('app');?>&l=<?php echo $lid;?>" style="float:right;margin-right:20px;"><i class="icon-list"></i> <?php echo _('Custom fields');?></a>
-    	</p><br/>
+    	<div class="well">
+			<?php echo _('List');?>: <a href="<?php echo get_app_info('path');?>/subscribers?i=<?php echo get_app_info('app');?>&l=<?php echo $lid;?>" title=""><span class="label label-info"><?php echo get_lists_data('name', $lid);?></span></a> | <a href="<?php echo get_app_info('path')?>/list?i=<?php echo get_app_info('app');?>" title=""><?php echo _('Back to lists');?></a>
+			
+			<div style="float:right;">
+					
+				<!-- Custom fields -->
+				<a href="<?php echo get_app_info('path');?>/custom-fields?i=<?php echo get_app_info('app');?>&l=<?php echo $lid;?>" style="margin-right:2px;"><i class="icon-list"></i> <?php echo _('Custom fields');?></a>
+				<span class="badge" style="margin-right:15px;"><?php echo get_custom_fields_count();?></span>
+				
+				<!-- Autoresponders -->
+				<?php 
+					$q = 'SELECT cron_ares FROM login WHERE id = '.get_app_info('main_userID');
+					$r = mysqli_query($mysqli, $q);
+					if ($r) while($row = mysqli_fetch_array($r)) $cron_ares = $row['cron_ares'];
+				?>
+				<?php if($cron_ares):?>
+				<a href="<?php echo get_app_info('path');?>/autoresponders-list?i=<?php echo get_app_info('app');?>&l=<?php echo $lid;?>" style="margin-right:2px;"><i class="icon-time"></i> <?php echo _('Autoresponders');?></a>
+				<span class="badge" style="margin-right:15px;"><?php echo get_autoresponder_count();?></span>
+				<?php else:?>
+				<a href="#ares_cron" data-toggle="modal" style="margin-right:15px;"><i class="icon-time"></i> <?php echo _('Autoresponders');?></a>
+				<?php endif;?>
+				
+				<!-- Segments -->
+				<a href="<?php echo get_app_info('path');?>/segments-list?i=<?php echo get_app_info('app');?>&l=<?php echo $lid;?>" style="margin-right:2px;"><i class="icon-filter"></i> <?php echo _('Segments');?></a>
+				<span class="badge" style="margin-right:15px;"><?php echo get_segments_count();?></span>
+				
+				<!-- Subscribe form -->
+				<a href="#subscribeform" data-toggle="modal" style="margin-right:15px;"><i class="icon-list-alt"></i> <?php echo _('Subscribe form');?></a>
+				
+				<!-- List settings -->
+				<a href="<?php echo get_app_info('path');?>/edit-list?i=<?php echo get_app_info('app');?>&l=<?php echo $lid;?>" style="margin-right:15px;"><i class="icon-wrench"></i> <?php echo _('List settings');?></a>
+		
+		    </div>
+		</div>    	
+    	<br/>
     	
     	<?php 
 	    	//Get gdpr_options

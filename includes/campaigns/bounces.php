@@ -60,6 +60,7 @@
 		$obj = json_decode($data->Message);
 		if(!isset($obj->{'bounce'})) exit;
 		$notificationType = $obj->{'notificationType'};
+		$eventType = $obj->{'eventType'};
 		$bounceType = $obj->{'bounce'}->{'bounceType'};
 		$bounceSubType = $obj->{'bounce'}->{'bounceSubType'};
 		$problem_email = $obj->{'bounce'}->{'bouncedRecipients'};
@@ -69,7 +70,7 @@
 		//check if email is valid, if not, exit
 		if(!filter_var($problem_email,FILTER_VALIDATE_EMAIL)) exit;
 		
-		if($notificationType=='Bounce')
+		if($notificationType=='Bounce' || $eventType=='Bounce')
 		{
 			//Update Bounce status
 			if($problem_email==$bounce_simulator_email) 

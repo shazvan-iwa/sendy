@@ -60,6 +60,7 @@
 		$obj = json_decode($data->Message);
 		if(!isset($obj->{'complaint'})) exit;
 		$notificationType = $obj->{'notificationType'};
+		$eventType = $obj->{'eventType'};
 		$problem_email = $obj->{'complaint'}->{'complainedRecipients'};
 		$problem_email = mysqli_real_escape_string($mysqli, get_email($problem_email[0]->{'emailAddress'}));
 		$from_email = mysqli_real_escape_string($mysqli, get_email($obj->{'mail'}->{'source'}));
@@ -68,7 +69,7 @@
 		//check if email is valid, if not, exit
 		if(!filter_var($problem_email,FILTER_VALIDATE_EMAIL)) exit;
 		
-		if($notificationType=='Complaint')
+		if($notificationType=='Complaint' || $eventType=='Complaint')
 		{			
 			//Update complaint status
 			if($problem_email==$complaint_simulator_email) 

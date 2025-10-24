@@ -51,6 +51,11 @@
 		$pass_encrypted = hash('sha512', $password.'PectGtma');		
 	}
 	
+	if($aws_key=='')
+		$aws_secret_query = ', s3_secret=""';
+	if($aws_secret!='')
+		$aws_secret_query = ', s3_secret="'.$aws_secret.'"';
+	
 	//------------------------------------------------------//
 	//                      FUNCTIONS                       //
 	//------------------------------------------------------//
@@ -67,9 +72,9 @@
 	if(!get_app_info('is_sub_user'))
 	{
 		if($change_pass)
-			$q = 'UPDATE login SET company="'.$company.'", name="'.$name.'", username="'.$email.'", password="'.$pass_encrypted.'", s3_key="'.$aws_key.'", s3_secret="'.$aws_secret.'", paypal="'.$paypal.'", timezone = "'.$timezone.'", language = "'.$language.'", ses_endpoint = "'.$ses_endpoint.'", brands_rows = '.$brands_rows.', strict_delete = '.$strict_delete.', dark_mode = '.$dark_mode.' WHERE id = '.$userID;
+			$q = 'UPDATE login SET company="'.$company.'", name="'.$name.'", username="'.$email.'", password="'.$pass_encrypted.'", s3_key="'.$aws_key.'" '.$aws_secret_query.', paypal="'.$paypal.'", timezone = "'.$timezone.'", language = "'.$language.'", ses_endpoint = "'.$ses_endpoint.'", brands_rows = '.$brands_rows.', strict_delete = '.$strict_delete.', dark_mode = '.$dark_mode.' WHERE id = '.$userID;
 		else
-			$q = 'UPDATE login SET company="'.$company.'", name="'.$name.'", username="'.$email.'", s3_key="'.$aws_key.'", s3_secret="'.$aws_secret.'", paypal="'.$paypal.'", timezone = "'.$timezone.'", language = "'.$language.'", ses_endpoint = "'.$ses_endpoint.'", brands_rows = '.$brands_rows.', strict_delete = '.$strict_delete.', dark_mode = '.$dark_mode.' WHERE id = '.$userID;
+			$q = 'UPDATE login SET company="'.$company.'", name="'.$name.'", username="'.$email.'", s3_key="'.$aws_key.'" '.$aws_secret_query.', paypal="'.$paypal.'", timezone = "'.$timezone.'", language = "'.$language.'", ses_endpoint = "'.$ses_endpoint.'", brands_rows = '.$brands_rows.', strict_delete = '.$strict_delete.', dark_mode = '.$dark_mode.' WHERE id = '.$userID;
 		$r = mysqli_query($mysqli, $q);
 		if ($r)
 		{

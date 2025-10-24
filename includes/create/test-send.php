@@ -12,6 +12,7 @@ $test_email = str_replace(" ", "", $test_email);
 $test_email_array = explode(',', $test_email);
 $is_ares = isset($_POST['is_ares']) && is_numeric($_POST['is_ares']) ? mysqli_real_escape_string($mysqli, (int)$_POST['is_ares']) : 0;
 $campaign_or_ares = $is_ares ? 'ares_emails' : 'campaigns';
+$ar = $is_ares ? 'a' : '';
 
 //select campaign to send test email
 $q = 'SELECT * FROM '.$campaign_or_ares.' WHERE id = '.$campaign_id;
@@ -198,14 +199,15 @@ for($i=0;$i<count($test_email_array);$i++)
 	$mail->IsHTML(true);
 	$mail->AddAddress($test_email_array[$i], '');
 	$mail->AddReplyTo($reply_to, $from_name);
+	$mail->AddCustomHeader('List-Unsubscribe-Post: List-Unsubscribe=One-Click');
 	$mail->AddCustomHeader('List-Unsubscribe: <'.$app_path.'/unsubscribe-success.php?c='.$campaign_id.'>');
-	if(file_exists('../../uploads/attachments/'.$campaign_id))
+	if(file_exists('../../uploads/attachments/'.$ar.$campaign_id))
 	{
-		foreach(glob('../../uploads/attachments/'.$campaign_id.'/*') as $attachment)
+		foreach(glob('../../uploads/attachments/'.$ar.$campaign_id.'/*') as $attachment)
 		{
 			$attachment = filter_var($attachment,FILTER_SANITIZE_SPECIAL_CHARS);
 			$attachment_filename = basename($attachment);
-			$attachment = '../../uploads/attachments/'.$campaign_id.'/'.$attachment_filename;
+			$attachment = '../../uploads/attachments/'.$ar.$campaign_id.'/'.$attachment_filename;
 			
 			if(file_exists($attachment))
 			    $mail->AddAttachment($attachment);

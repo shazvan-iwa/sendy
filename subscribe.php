@@ -376,11 +376,21 @@
 		$ip2 = ', "'.$ipaddress.'"';
 		
 		if($recaptcha_secretkey!='')
-		{
+		{	
 			//reCAPTCHA verification
 			$captcha=$_POST['g-recaptcha-response'];
 			$secretkey = $recaptcha_secretkey;					
-			$response=file_get_contents_curl("https://www.google.com/recaptcha/api/siteverify?secret=".$secretkey."&response=".$captcha."&remoteip=".$ipaddress);
+			
+			// rebuild URL (Thanks John Vilaikeo)
+			$verify_url = "https://www.google.com/recaptcha/api/siteverify";
+			$query_data = http_build_query([
+			'secret'   => $secretkey,
+			'response' => $captcha,
+			'remoteip' => $ipaddress
+			]);
+			
+			$response = file_get_contents_curl("{$verify_url}?{$query_data}");
+			
 			$responseKeys = json_decode($response,true);
 			if(intval($responseKeys["success"]) !== 1) 
 			{
@@ -499,9 +509,12 @@
 					//if custom field format is Date
 					if($cf_array[1]=='Date')
 					{
-						$date_value1 = strtotime($value);
-						$date_value2 = date("M d, Y 12\a\m", $date_value1);
-						$value = strtotime($date_value2);
+						if($value!='')
+						{
+							$date_value1 = strtotime($value);
+							$date_value2 = date("M d, Y 12\a\m", $date_value1);
+							$value = strtotime($date_value2);
+						}
 						$cf_vals .= $value;
 					}
 					//else if custom field format is Text
@@ -687,9 +700,6 @@
 						    
 						    //Run rules
 							run_rule($rules_data);
-							
-							//Update segments
-							update_segments($app_path, $list_id);
 						}
 					}
 				}

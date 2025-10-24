@@ -149,14 +149,22 @@
 		    		$(this).hide();
 		    		$("#edit-email").show();
 	    		});
-	    		$("#email").keypress(function(e){if(e.which == 13){update_email();}});
-	    		$("#email").focusout(function(){update_email();});
+	    		$("#email").keypress(function(e){if(e.which == 13)
+				{
+					update_email();
+					$(this).unbind("focusout");
+				}});
+	    		$("#email").focusout(function(){
+					update_email();
+					$(this).unbind("focusout");
+				});
 				function update_email()
 				{			
 					$("#edit-email").show(0, function(){
 						if($("#email").val() != $(this).text())
 						$.post("<?php echo get_app_info('path')?>/includes/subscribers/edit.php", { sid: <?php echo $id;?>, email: $("#email").val(), app: <?php echo $app;?> },
 						  function(data) {
+							  $("#email").focusout(function(){update_email();});
 						      if(data != 1)
 						      {
 						      	 $("#edit-email").text($("#edit-email").text());
